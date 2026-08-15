@@ -1510,8 +1510,8 @@ function ContactPage() {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2 space-y-6">
             {[
-              { Icon: MapPin, label: "Address", v: "[Foundation Address]" },
-              { Icon: Phone, label: "Phone", v: "[Official Phone]" },
+              { Icon: MapPin, label: "Address", v: "Joy Nagar ,House 2 ,Flat E 1 ,Mirpur,Dhaka,Bangladesh" },
+              { Icon: Phone, label: "Phone", v: "+880 17 7550 8587" },
               { Icon: Mail, label: "Email", v: "contact@mirawelfarefoundation.org"},
             ].map(({ Icon, label, v }) => (
               <div key={label} style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }} className="rounded-2xl p-6 flex items-start gap-4">
