@@ -1512,7 +1512,7 @@ function ContactPage() {
             {[
               { Icon: MapPin, label: "Address", v: "[Foundation Address]" },
               { Icon: Phone, label: "Phone", v: "[Official Phone]" },
-              { Icon: Mail, label: "Email", v: "[Official Email]" },
+              { Icon: Mail, label: "Email", v: "contact@mirawelfarefoundation.org"},
             ].map(({ Icon, label, v }) => (
               <div key={label} style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }} className="rounded-2xl p-6 flex items-start gap-4">
                 <div style={{ background: C.forest }} className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
