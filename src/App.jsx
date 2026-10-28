@@ -5,6 +5,7 @@ import {
   Scale, Landmark, ChevronRight, MapPin, Mail, Phone, Facebook,
   Instagram, Linkedin, Youtube, CheckCircle2, Target
 } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react";
 
 /* ============================================================
    DESIGN TOKENS
@@ -1868,6 +1869,7 @@ export default function App() {
       <Navbar page={page} go={go} />
       {pages[page]}
       <Footer go={go} />
+      <Analytics />
     </div>
   );
 }
