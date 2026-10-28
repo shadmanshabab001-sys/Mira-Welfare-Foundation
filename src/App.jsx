@@ -1282,14 +1282,41 @@ function DonatePage() {
   const [amt, setAmt] = useState("৳1,000");
   const [custom, setCustom] = useState("");
   const [cat, setCat] = useState("Where Most Needed");
+  const [copied, setCopied] = useState(false);
+  const [confirmSent, setConfirmSent] = useState(false);
+  const [confirmSending, setConfirmSending] = useState(false);
+  const [confirmError, setConfirmError] = useState("");
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setConfirmSending(true);
+    setConfirmError("");
+    try {
+      await sendForm(form, "New donation confirmation", { "Program": cat });
+      setConfirmSent(true);
+    } catch (err) {
+      setConfirmError(formErrorMessage(err));
+    } finally {
+      setConfirmSending(false);
+    }
+  };
+  const BKASH_DISPLAY = "+880 1689-315230";
+  const BKASH_COPY = "01689315230";
+  const amountText = amt === "custom" ? (custom ? `৳${Number(custom).toLocaleString("en-US")}` : "your chosen amount") : amt;
+  const copyNumber = async () => {
+    try {
+      await navigator.clipboard.writeText(BKASH_COPY);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      /* copying is optional; the number is shown on the page */
+    }
+  };
   return (
     <>
       <PageHead eyebrow="Give" title="Your Support Can Create Opportunity" sub="Choose an amount and a program area — every contribution is directed toward a specific, measurable purpose." />
       <div style={{ background: C.paper }} className="py-20 px-5 sm:px-8">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <DemoNotice>Demo website — donation processing is not yet connected.</DemoNotice>
-          </div>
           <div style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }} className="rounded-3xl p-8 sm:p-10">
             <div style={{ ...mono, color: C.inkSoft, fontSize: "11px" }} className="uppercase mb-3">
               Choose amount
@@ -1357,12 +1384,99 @@ function DonatePage() {
               ))}
             </div>
 
-            <button
-              style={{ background: C.gold, color: C.forestDeep, ...body }}
-              className="w-full py-4 rounded-full font-semibold text-sm flex items-center justify-center gap-2"
-            >
-              <Heart size={16} /> Donate {amt === "custom" ? (custom ? `৳${custom}` : "") : amt} — {cat}
-            </button>
+            <div style={{ ...body, color: C.inkSoft }} className="text-sm text-center">
+              Your gift: <span style={{ color: C.ink }} className="font-semibold">{amountText}</span> for{" "}
+              <span style={{ color: C.ink }} className="font-semibold">{cat}</span>
+            </div>
+          </div>
+
+          <div style={{ background: C.forest }} className="rounded-3xl p-8 sm:p-10 mt-6">
+            <Eyebrow dark>How to give</Eyebrow>
+            <div style={{ ...display, color: C.paper, fontWeight: 500 }} className="text-2xl sm:text-3xl mb-6">
+              Send {amountText} through bKash
+            </div>
+
+            <div style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }} className="rounded-2xl p-5 flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <div style={{ ...mono, color: C.goldSoft, fontSize: "11px", letterSpacing: "0.1em" }} className="uppercase">
+                  bKash Personal
+                </div>
+                <div style={{ ...display, color: C.paper, fontWeight: 600 }} className="text-2xl sm:text-3xl mt-1">
+                  {BKASH_DISPLAY}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={copyNumber}
+                style={{ background: C.gold, color: C.forestDeep, ...body }}
+                className="px-5 py-2.5 rounded-full font-semibold text-sm"
+              >
+                {copied ? "Copied!" : "Copy number"}
+              </button>
+            </div>
+
+            <ol style={{ ...body, color: "rgba(255,255,255,0.85)" }} className="mt-6 space-y-3 text-sm leading-relaxed">
+              {[
+                "Open the bKash app (or dial *247#) and choose Send Money.",
+                "Enter the number shown above.",
+                `Enter the amount: ${amountText}.`,
+                `In the reference, write: ${cat}.`,
+                "Confirm with your PIN, and keep the transaction ID (TrxID) from bKash.",
+              ].map((t, i) => (
+                <li key={i} className="flex gap-3">
+                  <span style={{ ...mono, color: C.gold }} className="shrink-0">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ol>
+
+            <div style={{ ...body, color: "rgba(255,255,255,0.7)", borderTop: "1px solid rgba(255,255,255,0.15)" }} className="mt-6 pt-5 text-sm leading-relaxed">
+              Thank you for your support. Please check that the number matches exactly before you send. Questions about your gift? Email us at {FORM_EMAIL}.
+            </div>
+          </div>
+
+          <div style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }} className="rounded-3xl p-8 sm:p-10 mt-6">
+            <Eyebrow>After you give</Eyebrow>
+            <div style={{ ...display, color: C.ink, fontWeight: 500 }} className="text-2xl sm:text-3xl mb-2">
+              Tell us about your gift
+            </div>
+            <p style={{ ...body, color: C.inkSoft }} className="text-sm leading-relaxed mb-6">
+              This step is optional, but it helps us match your donation and thank you properly.
+            </p>
+            {confirmSent ? (
+              <div style={{ background: C.moss, border: `1px solid ${C.mossLine}` }} className="rounded-2xl p-8 text-center">
+                <CheckCircle2 size={30} color={C.forest} className="mx-auto mb-3" />
+                <div style={{ ...display, color: C.ink, fontWeight: 600 }} className="text-xl mb-1">
+                  Thank you for your generosity
+                </div>
+                <p style={{ ...body, color: C.inkSoft }} className="text-sm">
+                  We have received your donation details.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleConfirm} className="space-y-5">
+                <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <Field label="Name" name="name" required />
+                  <Field label="Phone" name="Phone" type="tel" required />
+                  <Field label="Amount sent (৳)" name="Amount Sent" inputMode="numeric" required />
+                  <Field label="bKash Transaction ID (TrxID)" name="Transaction ID" required />
+                </div>
+                <Field label="Email (optional)" name="email" type="email" />
+                <label className="block">
+                  <span style={{ ...mono, color: C.inkSoft, fontSize: "11px" }} className="uppercase">
+                    Message (optional)
+                  </span>
+                  <textarea name="Message" rows={3} style={{ ...body, border: `1px solid ${C.mossLine}` }} className="mt-2 w-full px-4 py-3 rounded-xl bg-white text-sm focus:outline-none" />
+                </label>
+                {confirmError && <FormError>{confirmError}</FormError>}
+                <button type="submit" disabled={confirmSending} style={{ background: C.forest, color: C.paper, ...body, opacity: confirmSending ? 0.7 : 1 }} className="w-full py-4 rounded-full font-semibold text-sm">
+                  {confirmSending ? "Sending..." : "I have donated"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
