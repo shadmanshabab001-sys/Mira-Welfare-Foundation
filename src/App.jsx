@@ -8,28 +8,33 @@ import {
 
 /* ============================================================
    DESIGN TOKENS
-   Palette: forest #0F3D2E (primary), ink #1C1B18 (charcoal text),
-   parchment #FAF5EA (warm off-white), paper #FFFFFF, gold #C7973E
-   (amber accent), moss #DCE7DD (soft tint for cards/borders)
-   Type: "Fraunces" (display serif, editorial/humanitarian warmth)
-   + "Public Sans" (body, clean & legible) + "IBM Plex Mono" (data/eyebrows)
-   Signature element: the "Ledger" — a hand-ruled accountability strip
-   (thin gold rule + serif numerals) that recurs across impact figures,
-   the process steps and transparency page, standing in for the NGO's
-   promise to account for every taka and every outcome.
+   Palette (blue & white, matched to the logo):
+   forest = deep navy #0A2A8F (primary), forestDeep = darker navy #061B63,
+   ink = navy-black text #0F1B3D, parchment = soft blue-white #F4F8FF,
+   paper = #FFFFFF, gold = bright logo blue #38A9FF (accent on dark),
+   accent = mid blue #0A62D0 (accent on light), moss = pale blue tint
+   #E1ECFF for cards/tags, mossLine = #C3D6F4 borders.
+   (Token names are kept from the original theme so layouts don't change.)
+   Type: "Fraunces" (display serif) + "Public Sans" (body)
+   + "IBM Plex Mono" (data/eyebrows)
+   Signature element: the "Ledger" — a thin accent rule + serif numerals
+   that recurs across impact figures, the process steps and the
+   transparency page, standing in for the NGO's promise to account for
+   every taka and every outcome.
    ============================================================ */
 
 const C = {
-  forest: "#0F3D2E",
-  forestDeep: "#0A2C21",
-  ink: "#1C1B18",
-  parchment: "#FAF5EA",
+  forest: "#0A2A8F",
+  forestDeep: "#061B63",
+  ink: "#0F1B3D",
+  parchment: "#F4F8FF",
   paper: "#FFFFFF",
-  gold: "#C7973E",
-  goldSoft: "#E7D3A6",
-  moss: "#DCE7DD",
-  mossLine: "#BFD3C4",
-  inkSoft: "#5B5A54",
+  gold: "#38A9FF",
+  goldSoft: "#A8D8FF",
+  accent: "#0A62D0",
+  moss: "#E1ECFF",
+  mossLine: "#C3D6F4",
+  inkSoft: "#4A5878",
 };
 
 function useFonts() {
@@ -56,9 +61,9 @@ function Eyebrow({ children, dark }) {
   return (
     <div
       className="inline-flex items-center gap-2 mb-4"
-      style={{ ...mono, fontSize: "12px", letterSpacing: "0.14em", color: dark ? C.goldSoft : C.gold, textTransform: "uppercase" }}
+      style={{ ...mono, fontSize: "12px", letterSpacing: "0.14em", color: dark ? C.goldSoft : C.accent, textTransform: "uppercase" }}
     >
-      <span style={{ width: 22, height: 1, background: dark ? C.goldSoft : C.gold, display: "inline-block" }} />
+      <span style={{ width: 22, height: 1, background: dark ? C.goldSoft : C.accent, display: "inline-block" }} />
       {children}
     </div>
   );
@@ -322,19 +327,20 @@ function Navbar({ page, go }) {
     <div
       className="sticky top-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? "rgba(250,245,234,0.94)" : "transparent",
+        background: scrolled ? "rgba(244,248,255,0.94)" : "transparent",
         backdropFilter: scrolled ? "blur(10px)" : "none",
         borderBottom: scrolled ? `1px solid ${C.mossLine}` : "1px solid transparent",
       }}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-20 flex items-center justify-between">
         <button onClick={() => go("home")} className="flex items-center gap-3">
-          <div
-            style={{ background: C.forest, color: C.gold, ...display }}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold"
-          >
-            M
-          </div>
+          <img
+            src="/logo.png"
+            alt="Mira Welfare Foundation logo"
+            width={44}
+            height={44}
+            className="w-11 h-11 object-contain shrink-0"
+          />
           <div className="text-left leading-tight">
             <div style={{ ...display, color: C.ink, fontWeight: 600 }} className="text-[15px]">
               Mira Welfare Foundation
@@ -351,11 +357,11 @@ function Navbar({ page, go }) {
               key={n.key}
               onClick={() => go(n.key)}
               style={{ ...body, color: page === n.key ? C.forest : C.inkSoft }}
-              className="text-sm font-medium relative pb-1 transition-colors hover:text-[#0F3D2E]"
+              className="text-sm font-medium relative pb-1 transition-colors hover:text-[#0A2A8F]"
             >
               {n.label}
               {page === n.key && (
-                <span style={{ background: C.gold }} className="absolute left-0 -bottom-0.5 w-full h-[2px] rounded-full" />
+                <span style={{ background: C.accent }} className="absolute left-0 -bottom-0.5 w-full h-[2px] rounded-full" />
               )}
             </button>
           ))}
@@ -438,8 +444,14 @@ function Footer({ go }) {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 pb-14" style={{ borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-5">
-              <div style={{ background: C.gold, color: C.forestDeep, ...display }} className="w-10 h-10 rounded-full flex items-center justify-center font-semibold">
-                M
+              <div style={{ background: C.paper }} className="w-12 h-12 rounded-full flex items-center justify-center shrink-0">
+                <img
+                  src="/logo.png"
+                  alt="Mira Welfare Foundation logo"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 object-contain"
+                />
               </div>
               <div style={{ ...display, color: C.paper }} className="text-lg font-medium">
                 Mira Welfare Foundation
@@ -522,7 +534,7 @@ function Hero({ go }) {
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,44,33,0.55), ${C.forest} 92%)` }} />
+      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(6,27,99,0.55), ${C.forest} 92%)` }} />
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 pt-20 pb-28 sm:pt-28 sm:pb-36">
         <Reveal>
           <Eyebrow dark>Bangladesh · Registered Society No. S-15084/2026</Eyebrow>
@@ -779,7 +791,7 @@ function ImpactProcess() {
                 <div style={{ background: C.paper, border: `1px solid ${C.mossLine}`, ...body, color: C.ink }} className="px-5 py-3 rounded-full text-sm font-semibold">
                   {s}
                 </div>
-                {i < steps.length - 1 && <ArrowRight size={16} color={C.gold} />}
+                {i < steps.length - 1 && <ArrowRight size={16} color={C.accent} />}
               </React.Fragment>
             ))}
           </div>
@@ -797,7 +809,7 @@ function ImpactProcess() {
             <div className="grid sm:grid-cols-2 gap-3">
               {metrics.map((m) => (
                 <div key={m} className="flex items-center gap-2.5">
-                  <CheckCircle2 size={16} color={C.gold} />
+                  <CheckCircle2 size={16} color={C.accent} />
                   <span style={{ ...body, color: C.ink }} className="text-sm">
                     {m}
                   </span>
@@ -1031,7 +1043,7 @@ function AboutPage({ go }) {
             {values.map(([t, d], i) => (
               <Reveal key={t} delay={i * 50}>
                 <div style={{ border: `1px solid ${C.mossLine}` }} className="rounded-2xl p-6 h-full">
-                  <div style={{ ...display, color: C.gold, fontWeight: 600 }} className="text-2xl mb-2">
+                  <div style={{ ...display, color: C.accent, fontWeight: 600 }} className="text-2xl mb-2">
                     {String(i + 1).padStart(2, "0")}
                   </div>
                   <div style={{ ...display, color: C.ink, fontWeight: 600 }} className="text-lg mb-1.5">
@@ -1206,7 +1218,7 @@ function TransparencyPage() {
                   <div className="space-y-2.5">
                     {g.items.map((it) => (
                       <div key={it} className="flex items-start gap-2.5">
-                        <FileText size={14} color={C.gold} className="shrink-0 mt-0.5" />
+                        <FileText size={14} color={C.accent} className="shrink-0 mt-0.5" />
                         <span style={{ ...body, color: C.inkSoft }} className="text-sm">
                           {it}
                         </span>
@@ -1439,7 +1451,7 @@ function PartnerPage({ go }) {
           {cards.map((c, i) => (
             <Reveal key={c.title} delay={i * 80}>
               <div style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }} className="rounded-3xl p-8 h-full flex flex-col">
-                <div style={{ ...display, color: C.gold, fontWeight: 600 }} className="text-2xl mb-3">
+                <div style={{ ...display, color: C.accent, fontWeight: 600 }} className="text-2xl mb-3">
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div style={{ ...display, color: C.ink, fontWeight: 600 }} className="text-xl mb-3">
@@ -1617,7 +1629,7 @@ export default function App() {
           * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
         button:focus-visible, input:focus-visible, textarea:focus-visible {
-          outline: 2px solid ${C.gold};
+          outline: 2px solid ${C.accent};
           outline-offset: 2px;
         }
       `}</style>
