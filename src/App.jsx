@@ -1475,35 +1475,85 @@ function PartnerPage({ go }) {
 /* ============================================================
    LEADERSHIP PAGE
    ============================================================ */
+/* To add a person: add a { name, title, photo } line under the right group.
+   Put the photo file in the "public/leaders" folder and use "/leaders/file-name.jpg". */
+const LEADERS = {
+  "Chairman": [
+    { name: "Mazeda Begum", title: "Chairman", photo: "/leaders/mazeda-begum.jpg" },
+  ],
+  "Advisory Board": [
+    { name: "MM Tanvir Islam", title: "Advisor", photo: "/leaders/tanvir-islam.jpg" },
+  ],
+  "Executive Director": [
+    { name: "Md. Shadman Shabab", title: "Executive Director", photo: "/leaders/shadman-shabab.jpg" },
+  ],
+  "Executive Committee": [],
+  "Management Team": [],
+};
+
+function LeaderCard({ person }) {
+  return (
+    <div style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }} className="rounded-3xl overflow-hidden h-full">
+      <div style={{ background: C.moss }} className="aspect-[4/5] w-full">
+        <img
+          src={person.photo}
+          alt={`${person.name}, ${person.title}`}
+          className="w-full h-full object-cover object-top"
+          loading="lazy"
+        />
+      </div>
+      <div className="p-6">
+        <div style={{ ...display, color: C.ink, fontWeight: 600 }} className="text-xl leading-snug">
+          {person.name}
+        </div>
+        <div style={{ ...mono, color: C.accent, fontSize: "11px", letterSpacing: "0.08em" }} className="mt-2 uppercase">
+          {person.title}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LeadershipPage() {
-  const sections = ["Chairman / President", "Advisory Board", "Executive Director", "Executive Committee", "Management Team"];
+  const sections = Object.keys(LEADERS);
   return (
     <>
       <PageHead eyebrow="People" title="Leadership" sub="Profiles are published as they are confirmed. We do not publish placeholder names or credentials." />
       <div style={{ background: C.paper }} className="py-20 px-5 sm:px-8">
         <div className="max-w-6xl mx-auto space-y-14">
-          {sections.map((s, i) => (
-            <Reveal key={s} delay={i * 60}>
-              <div>
-                <div style={{ ...display, color: C.ink, fontWeight: 600 }} className="text-xl mb-5">
-                  {s}
-                </div>
-                <div style={{ background: C.parchment, border: `1px dashed ${C.mossLine}` }} className="rounded-2xl p-8 flex items-center gap-5">
-                  <div style={{ background: C.moss }} className="w-16 h-16 rounded-full flex items-center justify-center shrink-0">
-                    <Users size={22} color={C.forest} />
+          {sections.map((s, i) => {
+            const people = LEADERS[s];
+            return (
+              <Reveal key={s} delay={i * 60}>
+                <div>
+                  <div style={{ ...display, color: C.ink, fontWeight: 600 }} className="text-xl mb-5">
+                    {s}
                   </div>
-                  <div>
-                    <div style={{ ...body, color: C.ink }} className="font-semibold text-sm">
-                      Profile Coming Soon
+                  {people.length > 0 ? (
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {people.map((p) => (
+                        <LeaderCard key={p.name} person={p} />
+                      ))}
                     </div>
-                    <div style={{ ...mono, color: C.inkSoft, fontSize: "11px" }} className="mt-1">
-                      To be announced
+                  ) : (
+                    <div style={{ background: C.parchment, border: `1px dashed ${C.mossLine}` }} className="rounded-2xl p-8 flex items-center gap-5">
+                      <div style={{ background: C.moss }} className="w-16 h-16 rounded-full flex items-center justify-center shrink-0">
+                        <Users size={22} color={C.forest} />
+                      </div>
+                      <div>
+                        <div style={{ ...body, color: C.ink }} className="font-semibold text-sm">
+                          Profile Coming Soon
+                        </div>
+                        <div style={{ ...mono, color: C.inkSoft, fontSize: "11px" }} className="mt-1">
+                          To be announced
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
-              </div>
-            </Reveal>
-          ))}
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </>
