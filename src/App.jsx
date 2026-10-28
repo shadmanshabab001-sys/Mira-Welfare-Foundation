@@ -1574,7 +1574,7 @@ function ContactPage() {
             {[
               { Icon: MapPin, label: "Address", v: "Joy Nagar ,House 2 ,Flat E 1 ,Mirpur,Dhaka,Bangladesh" },
               { Icon: Phone, label: "Phone", v: "+880 17 7550 8587" },
-              { Icon: Mail, label: "Email", v: "contact@mirawelfarefoundation.org"},
+              { Icon: Mail, label: "Email", v: "mirawelfarefoundation.info@gmail.com"},
             ].map(({ Icon, label, v }) => (
               <div key={label} style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }} className="rounded-2xl p-6 flex items-start gap-4">
                 <div style={{ background: C.forest }} className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
