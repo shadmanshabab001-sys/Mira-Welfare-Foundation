@@ -37,6 +37,44 @@ const C = {
   inkSoft: "#4A5878",
 };
 
+/* ============================================================
+   FORMS — delivered to the foundation's email through Web3Forms
+   (web3forms.com). Paste the free access key below. This key is
+   meant to be public, so it is safe to keep in the website code.
+   ============================================================ */
+const FORM_ACCESS_KEY = "958bc2fb-3887-4056-847c-a31680ecac55";
+const FORM_EMAIL = "mirawelfarefoundation.info@gmail.com";
+
+async function sendForm(formEl, subject, extra = {}) {
+  if (FORM_ACCESS_KEY.startsWith("PASTE")) throw new Error("not-configured");
+  const data = new FormData(formEl);
+  data.append("access_key", FORM_ACCESS_KEY);
+  data.append("subject", subject);
+  data.append("from_name", "Mira Welfare Foundation Website");
+  Object.entries(extra).forEach(([k, v]) => data.append(k, v));
+  const res = await fetch("https://api.web3forms.com/submit", {
+    method: "POST",
+    body: data,
+    headers: { Accept: "application/json" },
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message || "failed");
+}
+
+function formErrorMessage(err) {
+  return err && err.message === "not-configured"
+    ? `This form is not connected yet. Please email us directly at ${FORM_EMAIL}.`
+    : `Something went wrong and your message was not sent. Please try again, or email us at ${FORM_EMAIL}.`;
+}
+
+function FormError({ children }) {
+  return (
+    <div role="alert" style={{ background: "#FDECEC", border: "1px solid #F3B8B8", color: "#8A1C1C", fontFamily: "'Public Sans', sans-serif" }} className="rounded-xl px-4 py-3 text-sm">
+      {children}
+    </div>
+  );
+}
+
 function useFonts() {
   useEffect(() => {
     if (document.getElementById("mira-fonts")) return;
@@ -1335,13 +1373,13 @@ function DonatePage() {
 /* ============================================================
    VOLUNTEER PAGE
    ============================================================ */
-function Field({ label, ...props }) {
+function Field({ label, name, ...props }) {
   return (
     <label className="block">
       <span style={{ ...mono, color: C.inkSoft, fontSize: "11px" }} className="uppercase">
         {label}
       </span>
-      <input {...props} style={{ ...body, border: `1px solid ${C.mossLine}` }} className="mt-2 w-full px-4 py-3 rounded-xl bg-white text-sm focus:outline-none" />
+      <input name={name || label} {...props} style={{ ...body, border: `1px solid ${C.mossLine}` }} className="mt-2 w-full px-4 py-3 rounded-xl bg-white text-sm focus:outline-none" />
     </label>
   );
 }
@@ -1350,6 +1388,22 @@ function VolunteerPage() {
   const areas = ["Education", "Healthcare", "Disaster Relief", "Environment", "Digital/Technology", "Fundraising", "Events", "Community Outreach"];
   const [selected, setSelected] = useState([]);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setSending(true);
+    setError("");
+    try {
+      await sendForm(form, "New volunteer registration", { "Area of Interest": selected.join(", ") || "Not specified" });
+      setSent(true);
+    } catch (err) {
+      setError(formErrorMessage(err));
+    } finally {
+      setSending(false);
+    }
+  };
   const toggle = (a) => setSelected((s) => (s.includes(a) ? s.filter((x) => x !== a) : [...s, a]));
   return (
     <>
@@ -1363,21 +1417,19 @@ function VolunteerPage() {
                 Thank you for registering
               </div>
               <p style={{ ...body, color: C.inkSoft }} className="text-sm">
-                This is a demo form — your response was simulated locally and not sent anywhere.
+                Your details have been sent to our team. We will contact you soon.
               </p>
             </div>
           ) : (
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSent(true);
-              }}
+              onSubmit={handleSubmit}
               style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }}
               className="rounded-3xl p-8 sm:p-10 space-y-5"
             >
+              <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
               <div className="grid sm:grid-cols-2 gap-5">
-                <Field label="Full Name" required />
-                <Field label="Email" type="email" required />
+                <Field label="Full Name" name="name" required />
+                <Field label="Email" name="email" type="email" required />
                 <Field label="Phone" type="tel" />
                 <Field label="District" />
               </div>
@@ -1410,10 +1462,11 @@ function VolunteerPage() {
                 <span style={{ ...mono, color: C.inkSoft, fontSize: "11px" }} className="uppercase">
                   Message
                 </span>
-                <textarea rows={4} style={{ ...body, border: `1px solid ${C.mossLine}` }} className="mt-2 w-full px-4 py-3 rounded-xl bg-white text-sm focus:outline-none" />
+                <textarea name="Message" rows={4} style={{ ...body, border: `1px solid ${C.mossLine}` }} className="mt-2 w-full px-4 py-3 rounded-xl bg-white text-sm focus:outline-none" />
               </label>
-              <button type="submit" style={{ background: C.gold, color: C.forestDeep, ...body }} className="w-full py-4 rounded-full font-semibold text-sm">
-                Become a Volunteer
+              {error && <FormError>{error}</FormError>}
+              <button type="submit" disabled={sending} style={{ background: C.gold, color: C.forestDeep, ...body, opacity: sending ? 0.7 : 1 }} className="w-full py-4 rounded-full font-semibold text-sm">
+                {sending ? "Sending..." : "Become a Volunteer"}
               </button>
             </form>
           )}
@@ -1565,6 +1618,22 @@ function LeadershipPage() {
    ============================================================ */
 function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setSending(true);
+    setError("");
+    try {
+      await sendForm(form, "New message from website contact form");
+      setSent(true);
+    } catch (err) {
+      setError(formErrorMessage(err));
+    } finally {
+      setSending(false);
+    }
+  };
   return (
     <>
       <PageHead eyebrow="Reach Us" title="Contact Mira Welfare Foundation" sub="Bangladesh" />
@@ -1607,21 +1676,19 @@ function ContactPage() {
                   Message received
                 </div>
                 <p style={{ ...body, color: C.inkSoft }} className="text-sm">
-                  Demo form — this submission was simulated locally.
+                  Thank you for contacting us. We will get back to you at the email you provided.
                 </p>
               </div>
             ) : (
               <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setSent(true);
-                }}
+                onSubmit={handleSubmit}
                 style={{ background: C.parchment, border: `1px solid ${C.mossLine}` }}
                 className="rounded-3xl p-8 sm:p-10 space-y-5"
               >
+                <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
                 <div className="grid sm:grid-cols-2 gap-5">
-                  <Field label="Name" required />
-                  <Field label="Email" type="email" required />
+                  <Field label="Name" name="name" required />
+                  <Field label="Email" name="email" type="email" required />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Phone" type="tel" />
@@ -1631,10 +1698,11 @@ function ContactPage() {
                   <span style={{ ...mono, color: C.inkSoft, fontSize: "11px" }} className="uppercase">
                     Message
                   </span>
-                  <textarea rows={5} style={{ ...body, border: `1px solid ${C.mossLine}` }} className="mt-2 w-full px-4 py-3 rounded-xl bg-white text-sm focus:outline-none" />
+                  <textarea name="Message" rows={5} style={{ ...body, border: `1px solid ${C.mossLine}` }} className="mt-2 w-full px-4 py-3 rounded-xl bg-white text-sm focus:outline-none" />
                 </label>
-                <button type="submit" style={{ background: C.gold, color: C.forestDeep, ...body }} className="w-full py-4 rounded-full font-semibold text-sm">
-                  Send Message
+                {error && <FormError>{error}</FormError>}
+                <button type="submit" disabled={sending} style={{ background: C.gold, color: C.forestDeep, ...body, opacity: sending ? 0.7 : 1 }} className="w-full py-4 rounded-full font-semibold text-sm">
+                  {sending ? "Sending..." : "Send Message"}
                 </button>
               </form>
             )}
